@@ -7,7 +7,14 @@
     <h1>{{ article.title }}</h1>
     <div>{{ article.content }}</div>
     <hr>
+    <h3>阅读统计</h3>
     <p>总阅读量：{{ stat.total_views }}</p>
     <p>访客数：{{ stat.unique_visitors }}</p>
+    <p>当前用户（{{ user_id }}）阅读次数：{{ stat.user_views }}</p>
+    
+    <hr>
+    <h3>管理操作</h3>
+    <p><a href="/article/{{ article.id }}/sync/">同步数据到数据库</a></p>
+    <p><a href="/cache/hit_rate/">查看缓存命中率</a></p>
 </body>
 </html>

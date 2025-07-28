@@ -24,4 +24,5 @@ urlpatterns = [
     path('article/<int:article_id>/', views.article_detail, name='article_detail'),
     path('article/<int:article_id>/sync/', views.sync_views, name='sync_views'),
     path('cache/hit_rate/', views.cache_hit_rate, name='cache_hit_rate'),
+    path('article/<int:article_id>/sync_visitors/', views.sync_visitors, name='sync_visitors'),
 ]

@@ -7,21 +7,36 @@ redis_client = RedisClient()
 
 def article_detail(request, article_id):
     article = get_object_or_404(Article, id=article_id)
+    
+    # 生成用户ID（这里用IP地址模拟，实际项目中应该用真实的用户ID）
+    user_id = request.META.get('REMOTE_ADDR', 'unknown')
+    
+    # 记录用户访问
+    user_views = redis_client.record_user_visit(article_id, user_id)
+    
+    # 获取总阅读量
     cache_key = f"article:{article_id}:views"
-    # 优先从缓存读取
-    views = redis_client.get(cache_key)
-    if views is None:
+    total_views = redis_client.get(cache_key)
+    if total_views is None:
         # 缓存未命中，从数据库读并写入缓存
         stat, _ = ArticleReadStat.objects.get_or_create(article=article)
-        views = stat.total_views
-        redis_client.set(cache_key, views)
+        total_views = stat.total_views
+        redis_client.set(cache_key, total_views)
     else:
         # 缓存命中，自动加1
-        views = redis_client.incr(cache_key)
-    # 这里只是演示，后续我们会用异步任务定期将缓存写回数据库
+        total_views = redis_client.incr(cache_key)
+    
+    # 获取访客数
+    visitor_count = redis_client.get_visitor_count(article_id)
+    
     return render(request, 'article_detail.html', {
         'article': article,
-        'stat': {'total_views': views, 'unique_visitors': 0},  # 访客数后续实现
+        'stat': {
+            'total_views': total_views,
+            'unique_visitors': visitor_count,
+            'user_views': user_views
+        },
+        'user_id': user_id,
     })
 
 def sync_views(request, article_id):
@@ -31,3 +46,7 @@ def sync_views(request, article_id):
 def cache_hit_rate(request):
     rate = redis_client.get_hit_rate()
     return JsonResponse({'cache_hit_rate': f"{rate}%"})
+
+def sync_visitors(request, article_id):
+    redis_client.sync_visitors_to_db(article_id)
+    return JsonResponse({'status': 'visitors synced'})
