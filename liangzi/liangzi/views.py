@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Article, ArticleReadStat
 from .cache import RedisClient
+from django.http import JsonResponse
 
 redis_client = RedisClient()
 
@@ -22,3 +23,11 @@ def article_detail(request, article_id):
         'article': article,
         'stat': {'total_views': views, 'unique_visitors': 0},  # 访客数后续实现
     })
+
+def sync_views(request, article_id):
+    redis_client.sync_views_to_db(article_id)
+    return JsonResponse({'status': 'ok'})
+
+def cache_hit_rate(request):
+    rate = redis_client.get_hit_rate()
+    return JsonResponse({'cache_hit_rate': f"{rate}%"})
