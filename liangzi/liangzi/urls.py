@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import path
 import os
 from . import views
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('article/<int:article_id>/', views.article_detail, name='article_detail'),

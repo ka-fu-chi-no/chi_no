@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import redis
 from liangzi.liangzi.models import Article, ArticleReadStat
-
+# 连接redis
 class RedisClient:
     def __init__(self, host='localhost', port=6379, db=0):
         self.client = redis.StrictRedis(host=host, port=port, db=db, decode_responses=True)
@@ -45,18 +45,16 @@ class RedisClient:
             # 记录用户到访客集合
             visitor_key = f"article:{article_id}:visitors"
             self.client.sadd(visitor_key, user_id)
-            
             # 记录用户阅读次数
             user_views_key = f"article:{article_id}:user:{user_id}:views"
             user_views = self.client.incr(user_views_key)
-            
             return user_views
         except Exception as e:
             print(f"Record user visit error: {e}")
             return 1
 
     def get_visitor_count(self, article_id):
-        """获取访客数"""
+        # 获取访客数
         try:
             visitor_key = f"article:{article_id}:visitors"
             return self.client.scard(visitor_key)
@@ -65,7 +63,7 @@ class RedisClient:
             return 0
 
     def get_user_views(self, article_id, user_id):
-        """获取某用户对某文章的阅读次数"""
+        # 获取某用户对某文章的阅读次数
         try:
             user_views_key = f"article:{article_id}:user:{user_id}:views"
             views = self.client.get(user_views_key)
@@ -75,7 +73,6 @@ class RedisClient:
             return 0
 
     def sync_views_to_db(self, article_id):
-        """同步阅读量和访客数据到数据库"""
         # 同步阅读量
         cache_key = f"article:{article_id}:views"
         views = self.get(cache_key)
@@ -91,7 +88,7 @@ class RedisClient:
                 print(f"DB sync error: {e}")
 
     def sync_visitors_to_db(self, article_id):
-        """同步访客数据到数据库"""
+        # 同步访客数据到数据库
         try:
             visitor_count = self.get_visitor_count(article_id)
             article = Article.objects.get(id=article_id)

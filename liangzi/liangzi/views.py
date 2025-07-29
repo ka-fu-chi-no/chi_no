@@ -8,13 +8,10 @@ redis_client = RedisClient()
 
 def article_detail(request, article_id):
     article = get_object_or_404(Article, id=article_id)
-    
-    # 生成用户ID（这里用IP地址模拟，实际项目中应该用真实的用户ID）
-    user_id = request.META.get('REMOTE_ADDR', 'unknown')
-    
+    # 生成用户ID
+    user_id = request.user.username
     # 记录用户访问
     user_views = redis_client.record_user_visit(article_id, user_id)
-    
     # 获取总阅读量
     cache_key = f"article:{article_id}:views"
     total_views = redis_client.get(cache_key)
