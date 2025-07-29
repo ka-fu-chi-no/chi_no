@@ -3,7 +3,6 @@ from django.shortcuts import render, get_object_or_404
 from .models import Article, ArticleReadStat
 from .cache import RedisClient
 from django.http import JsonResponse
-
 redis_client = RedisClient()
 
 def article_detail(request, article_id):
@@ -26,7 +25,6 @@ def article_detail(request, article_id):
     
     # 获取访客数
     visitor_count = redis_client.get_visitor_count(article_id)
-    
     # 当阅读量达到一定阈值时，触发同步
     if total_views % 10 == 0:  # 每10次访问同步一次
         redis_client.sync_views_to_db(article_id)

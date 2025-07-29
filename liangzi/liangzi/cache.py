@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import redis
-from liangzi.liangzi.models import Article, ArticleReadStat
+
 # 连接redis
 class RedisClient:
     def __init__(self, host='localhost', port=6379, db=0):
