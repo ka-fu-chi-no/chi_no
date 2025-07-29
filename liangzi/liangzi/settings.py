@@ -62,9 +62,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        }
+        # 移除 charset 参数，SQLite 不支持
     }
 }
 

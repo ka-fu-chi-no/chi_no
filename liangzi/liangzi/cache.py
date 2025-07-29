@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import redis
+from liangzi.liangzi.models import Article, ArticleReadStat
 
 class RedisClient:
     def __init__(self, host='localhost', port=6379, db=0):
@@ -39,7 +40,7 @@ class RedisClient:
             return None
 
     def record_user_visit(self, article_id, user_id):
-        """记录用户访问，返回该用户对这篇文章的阅读次数"""
+        # 记录用户访问，返回该用户对这篇文章的阅读次数
         try:
             # 记录用户到访客集合
             visitor_key = f"article:{article_id}:visitors"
